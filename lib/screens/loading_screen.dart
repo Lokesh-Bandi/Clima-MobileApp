@@ -13,7 +13,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
   }
   void getLocation() async{
    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    print(position);
+   List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(position.latitude, position.longitude);
+   Placemark place=placemark[0];
+   print(place.locality+" "+place.administrativeArea+" "+place.postalCode+" "+place.name+" "+place.country);
   }
   void deactivate(){
     super.deactivate();
