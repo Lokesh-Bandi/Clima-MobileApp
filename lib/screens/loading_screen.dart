@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:clima/location.dart';
+import 'package:http/http.dart' as http;
 class LoadingScreen extends StatefulWidget {
   @override
   _LoadingScreenState createState() => _LoadingScreenState();
@@ -7,21 +9,37 @@ class LoadingScreen extends StatefulWidget {
 
 class _LoadingScreenState extends State<LoadingScreen> {
   @override
+  Location place= Location();
+  double lat;
+  double lon;
   void initState() {
     super.initState();
     getLocation();
+
   }
   void getLocation() async{
-   Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-   List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(position.latitude, position.longitude);
-   Placemark place=placemark[0];
-   print(place.locality+" "+place.administrativeArea+" "+place.postalCode+" "+place.name+" "+place.country);
+    await place.getCurrentLocation();
+    lat=place.latitude;
+    lon=place.longitude;
+    getWeather();
+  }
+  void getWeather() async{
+    http.Response weatherResponse= await http.get('https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=95c19c4cd8800380d725ac767a7e8592');
+    String data=weatherResponse.body;
+      var temp1=jsonDecode(data)['main']['temp'];
+    var city=jsonDecode(data)['name'];
+    var desc=jsonDecode(data)['weather'][0]['description'];
+    print(weatherResponse.statusCode);
+    print(temp1);
+    print(city);
+    print(desc);
   }
   void deactivate(){
     super.deactivate();
     print("Thank you");
   }
   Widget build(BuildContext context) {
+
     return Scaffold();
   }
 }
